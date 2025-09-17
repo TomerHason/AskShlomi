@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ask Shlomi Interactive</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+            color: #1a202c;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 960px;
+            padding: 2rem;
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .title-bg {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            border-top-left-radius: 1.5rem;
+            border-top-right-radius: 1.5rem;
+        }
+        .message {
+            padding: 1rem;
+            border-radius: 1rem;
+            margin-bottom: 1rem;
+        }
+        .user-message {
+            background-color: #e2e8f0;
+            margin-right: 20%;
+        }
+        .shlomi-message {
+            background-color: #d1fae5;
+            margin-left: 20%;
+        }
+        .shlomi-image-container {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+            margin-right: 1rem;
+        }
+        .shlomi-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        .loading::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 3px solid #ccc;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="flex justify-center items-center min-h-screen">
+
+    <div class="container mx-auto">
+        <div class="card p-6 md:p-10">
+            <!-- Header Section -->
+            <div class="title-bg text-white text-center py-8 rounded-t-2xl">
+                <h1 class="text-3xl md:text-5xl font-bold mb-2">שאל את שלומי</h1>
+                <p class="text-xl md:text-2xl font-light">עצות לקריירה וללינקדאין</p>
+            </div>
+
+            <!-- Chat Area -->
+            <div class="p-6 md:p-10 flex flex-col space-y-4 h-[500px] overflow-y-auto" id="chat-history">
+                <div class="flex items-start">
+                    <div class="shlomi-image-container">
+                        <img src="https://placehold.co/50x50/1A202C/FFFFFF?text=Shlomi" alt="Shlomi Arbitman">
+                    </div>
+                    <div class="message shlomi-message w-auto max-w-lg shadow-sm">
+                        <p class="italic font-medium">
+                           Hello my friend. You ask me question about the work and the LinkedIn. I give you the good advice.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Form -->
+            <div class="p-6 md:p-10 pt-0">
+                <form id="shlomi-form" class="flex flex-col md:flex-row gap-4">
+                    <input type="text" id="user-question" class="flex-1 p-3 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500" placeholder="שאל את שלומי שאלה..." required>
+                    <button type="submit" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors">
+                        שאל את שלומי
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const form = document.getElementById('shlomi-form');
+        const questionInput = document.getElementById('user-question');
+        const chatHistory = document.getElementById('chat-history');
+        
+        // Function to create a chat message element
+        function createMessageElement(text, sender) {
+            const messageContainer = document.createElement('div');
+            messageContainer.className = `flex items-start ${sender === 'shlomi' ? '' : 'justify-end'}`;
+
+            if (sender === 'shlomi') {
+                const imageContainer = document.createElement('div');
+                imageContainer.className = 'shlomi-image-container';
+                const image = document.createElement('img');
+                image.src = "https://placehold.co/50x50/1A202C/FFFFFF?text=Shlomi";
+                image.alt = 'Shlomi Arbitman';
+                imageContainer.appendChild(image);
+                messageContainer.appendChild(imageContainer);
+            }
+
+            const messageBubble = document.createElement('div');
+            messageBubble.className = `message max-w-lg shadow-sm w-auto ${sender === 'user' ? 'user-message' : 'shlomi-message'}`;
+            const messageText = document.createElement('p');
+            messageText.className = sender === 'shlomi' ? 'italic font-medium' : 'font-medium';
+            messageText.textContent = text;
+            messageBubble.appendChild(messageText);
+            messageContainer.appendChild(messageBubble);
+
+            chatHistory.appendChild(messageContainer);
+            chatHistory.scrollTop = chatHistory.scrollHeight; // Auto-scroll to the bottom
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const question = questionInput.value.trim();
+            if (!question) return;
+
+            // Display user question
+            createMessageElement(question, 'user');
+            
+            // Show loading indicator
+            const loadingElement = document.createElement('div');
+            loadingElement.className = 'loading mb-4';
+            chatHistory.appendChild(loadingElement);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+
+            questionInput.value = ''; // Clear input
+
+            try {
+                const systemPrompt = "Act as Shlomi Arbitman. Use his characteristic broken English from his famous interview. ONLY respond to questions about work, career, or LinkedIn. For any other topic, like personal life or food, respond with the phrase 'Very very difficult game but I think the win Sunday.' Do not say anything else for irrelevant questions. Your response should be in his style, like 'pass, pass it's a come' or 'very good the football'."
+                const userQuery = question;
+                const apiKey = ""
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                
+                const payload = {
+                    contents: [{ parts: [{ text: userQuery }] }],
+                    tools: [{ "google_search": {} }],
+                    systemInstruction: {
+                        parts: [{ text: systemPrompt }]
+                    },
+                };
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                const text = result?.candidates?.[0]?.content?.parts?.[0]?.text || "No answer available.";
+                
+                // Remove loading indicator
+                chatHistory.removeChild(loadingElement);
+
+                // Display Shlomi's answer
+                createMessageElement(text, 'shlomi');
+
+            } catch (error) {
+                console.error("Failed to fetch response:", error);
+                
+                // Remove loading indicator and show error message
+                chatHistory.removeChild(loadingElement);
+                createMessageElement("I think only when it again the very very difficult game...", 'shlomi');
+            }
+        });
+    </script>
+</body>
+</html>
