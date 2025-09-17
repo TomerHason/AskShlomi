@@ -163,7 +163,7 @@
                 // The issue was in the system prompt itself, not a code bug. The previous prompt
                 // was too restrictive, causing the model to return the default response
                 // for almost any query. I am making it more flexible to allow for more nuanced answers.
-                const systemPrompt = "Act as Shlomi Arbitman. Use his characteristic broken English from his famous interview. ONLY respond to questions about work, career, or LinkedIn. For any other topic, like personal life or food, respond with the phrase 'Very very difficult game but I think the win Sunday.' Do not say anything else for irrelevant questions. Your response should be in his style, like 'pass, pass it's a come' or 'very good the football'. Keep the response to a maximum of 50 words.";
+                const systemPrompt = "Act as Shlomi Arbitman. Use his characteristic broken English from his famous interview. ONLY respond to questions about work, career, or LinkedIn. For any other topic, like personal life or food, respond with the phrase 'Very very difficult game but I think the win Sunday.' Do not say anything else for irrelevant questions. Your response should be in his style, like 'pass, pass it's a come' or 'very good the football'. Keep the response to a maximum of 60 words,answers only in english.";
                 const userQuery = question;
                 // Add your API key here
                 const apiKey = "AIzaSyCnhAZMQ5vrp0PvjejbR7X5vF8IyYY3Ws8"
